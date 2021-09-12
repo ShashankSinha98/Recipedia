@@ -10,27 +10,27 @@ data class Recipe(
 
     @Expose
     @SerializedName("title")
-    private val title: String?= null,
+    var title: String?= null,
 
     @Expose
     @SerializedName("publisher")
-    private val publisher: String?= null,
+    var publisher: String?= null,
 
     @Expose
     @SerializedName("ingredients")
-    private val ingredients: List<String>?= null,
+    var ingredients: List<String>?= null,
 
     @Expose
     @SerializedName("recipe_id")
-    private val recipeId: String?= null,
+    var recipeId: String?= null,
 
     @Expose
     @SerializedName("image_url")
-    private val imageUrl: String?= null,
+    var imageUrl: String?= null,
 
     @Expose
     @SerializedName("social_rank")
-    private val socialRank: Float?= null,
+    var socialRank: Float?= null,
 
 ) : Parcelable {
 
