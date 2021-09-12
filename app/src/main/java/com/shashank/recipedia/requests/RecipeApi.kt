@@ -17,7 +17,7 @@ interface RecipeApi {
 
 
     // Get recipe request
-    @GET("api/v2/recipes")
+    @GET("api/get")
     fun getRecipe(
         @Query("rId") recipeId: String
     ): Call<RecipeResponse>
