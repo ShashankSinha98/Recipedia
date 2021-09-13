@@ -3,14 +3,18 @@ package com.shashank.recipedia.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.shashank.recipedia.R
 import com.shashank.recipedia.models.Recipe
+import com.shashank.recipedia.util.Constants
 import kotlin.math.roundToInt
 
 class RecipeRecyclerAdapter(
-    private var mRecipes: List<Recipe>,
     private val mOnRecipeListener: OnRecipeListener
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private var mRecipes: List<Recipe> = listOf<Recipe>()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -20,12 +24,22 @@ class RecipeRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
         val recipeViewHolder = holder as RecipeViewHolder
 
+        val requestOptions: RequestOptions = RequestOptions()
+            .placeholder(R.drawable.loading_img)
+
         recipeViewHolder.apply {
-            title.text = mRecipes[position].title?: "NA"
-            publisher.text = mRecipes[position].publisher?: "NA"
-            socialScore.text = (mRecipes[position].socialRank ?: 0F).roundToInt().toString()
+            title.text = mRecipes[position].title?: Constants.TEXT_NOT_FOUND_MSG
+            publisher.text = mRecipes[position].publisher?: Constants.TEXT_NOT_FOUND_MSG
+            socialScore.text = (mRecipes[position].socialRank ?: Constants.SCORE_NOT_FOUND_MSG).
+                                        roundToInt().toString()
+
+            Glide.with(holder.itemView.context)
+                .setDefaultRequestOptions(requestOptions)
+                .load(mRecipes[position].imageUrl?: Constants.IMAGE_NOT_FOUND_URL)
+                .into(imageView)
         }
 
     }

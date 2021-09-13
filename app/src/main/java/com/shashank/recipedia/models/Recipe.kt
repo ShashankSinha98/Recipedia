@@ -21,15 +21,15 @@ data class Recipe(
     var ingredients: List<String>?= null,
 
     @Expose
-    @SerializedName("recipe_id")
+    @SerializedName("id")
     var recipeId: String?= null,
 
     @Expose
-    @SerializedName("image_url")
+    @SerializedName("imageUrl")
     var imageUrl: String?= null,
 
     @Expose
-    @SerializedName("social_rank")
+    @SerializedName("socialUrl")
     var socialRank: Float?= null,
 
 ) : Parcelable {
