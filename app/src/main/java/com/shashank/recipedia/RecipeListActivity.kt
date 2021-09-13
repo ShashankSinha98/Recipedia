@@ -1,23 +1,15 @@
 package com.shashank.recipedia
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shashank.recipedia.adapters.OnRecipeListener
 import com.shashank.recipedia.adapters.RecipeRecyclerAdapter
-import com.shashank.recipedia.models.Recipe
-import com.shashank.recipedia.requests.RecipeApi
-import com.shashank.recipedia.requests.ServiceGenerator
-import com.shashank.recipedia.requests.responses.RecipeResponse
 import com.shashank.recipedia.util.Testing
 import com.shashank.recipedia.viewmodels.RecipeListViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
@@ -35,8 +27,9 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         mRecipeListViewModel = ViewModelProvider(this).get(RecipeListViewModel::class.java)
 
         initRecyclerView()
+        initSearchView()
         subscribeObservers()
-        testRecipeRequest()
+
     }
 
     private fun subscribeObservers() {
@@ -49,8 +42,22 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         })
     }
 
-    private fun searchRecipesApi(query: String, pageNumber: Int) {
-        mRecipeListViewModel.searchRecipesApi(query, pageNumber)
+
+
+    private fun initSearchView() {
+        val searchView: SearchView = findViewById(R.id.search_view)
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    mRecipeListViewModel.searchRecipesApi(it, 1)
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean = false
+
+        })
     }
 
 
@@ -60,9 +67,6 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         mRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun testRecipeRequest() {
-        searchRecipesApi("chicken breast",1)
-    }
 
     override fun onRecipeClick(position: Int) {
         TODO("Not yet implemented")
