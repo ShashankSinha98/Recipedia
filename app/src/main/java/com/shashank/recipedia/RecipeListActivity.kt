@@ -9,6 +9,7 @@ import com.shashank.recipedia.models.Recipe
 import com.shashank.recipedia.requests.RecipeApi
 import com.shashank.recipedia.requests.ServiceGenerator
 import com.shashank.recipedia.requests.responses.RecipeResponse
+import com.shashank.recipedia.util.Testing
 import com.shashank.recipedia.viewmodels.RecipeListViewModel
 import retrofit2.Call
 import retrofit2.Callback
@@ -29,90 +30,25 @@ class RecipeListActivity : BaseActivity() {
         findViewById<Button>(R.id.test_btn).setOnClickListener {
             testRecipeRequest()
         }
+
+        subscribeObservers()
     }
 
     private fun subscribeObservers() {
         mRecipeListViewModel.getRecipes().observe(this, Observer { recipes ->
 
+            recipes?.let { recipes ->
+                Testing.printRecipes(TAG,recipes)
+            }
         })
+    }
+
+    private fun searchRecipesApi(query: String, pageNumber: Int) {
+        mRecipeListViewModel.searchRecipesApi(query, pageNumber)
     }
 
 
     private fun testRecipeRequest() {
-        val recipeApi: RecipeApi = ServiceGenerator.recipeApi
-
-        /*val responseCall: Call<RecipeSearchResponse> = recipeApi.searchRecipes(
-            query = "rice",
-            page = "1"
-        )
-
-        responseCall.enqueue(object : Callback<RecipeSearchResponse> {
-
-            override fun onResponse(
-                call: Call<RecipeSearchResponse>,
-                response: Response<RecipeSearchResponse>
-            ) {
-               Log.d(TAG,"onResponse: Server response: $response")
-
-                if(response.code()==200) {
-                    Log.d(TAG,"onResponse: ${response.body()}")
-
-                    val recipes: List<Recipe>? = response.body()?.recipes
-
-                    if (recipes != null) {
-                        for(recipe in recipes) {
-                            Log.d(TAG,"onResponse: ${recipe.title}")
-                        }
-                    }
-                } else {
-
-                    try {
-                        Log.d(TAG,"onResponse: ${response.errorBody()}")
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<RecipeSearchResponse>, t: Throwable) {
-                Log.d(TAG,"onResponse[Failure]: ${t.message}")
-            }
-
-        })*/
-
-        val responseCall: Call<RecipeResponse> = recipeApi.getRecipe(
-            recipeId = "41470"
-        )
-
-
-        responseCall.enqueue(object : Callback<RecipeResponse> {
-            override fun onResponse(
-                call: Call<RecipeResponse>,
-                response: Response<RecipeResponse>
-            ) {
-                Log.d(TAG,"onResponse: Server response: $response")
-
-                if(response.code()==200) {
-                    Log.d(TAG,"onResponse: ${response.body()}")
-
-                    val recipe: Recipe? = response.body()?.recipe
-
-                    Log.d(TAG,"onResponse: $recipe")
-
-                } else {
-
-                    try {
-                        Log.d(TAG,"onResponse: ${response.errorBody()}")
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<RecipeResponse>, t: Throwable) {
-                Log.d(TAG,"onResponse[Failure]: ${t.message}")
-            }
-
-        })
+        searchRecipesApi("chicken breast",1)
     }
 }

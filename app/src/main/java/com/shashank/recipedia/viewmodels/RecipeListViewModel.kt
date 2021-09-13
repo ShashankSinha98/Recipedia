@@ -11,6 +11,9 @@ class RecipeListViewModel: ViewModel() {
     private val mRecipeRepository: RecipeRepository = RecipeRepository
 
 
-
     fun getRecipes(): LiveData<List<Recipe>> = mRecipeRepository.getRecipes()
+
+    fun searchRecipesApi(query: String, pageNumber: Int) {
+        mRecipeRepository.searchRecipesApi(query, pageNumber)
+    }
 }

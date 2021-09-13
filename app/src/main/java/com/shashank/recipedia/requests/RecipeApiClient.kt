@@ -59,10 +59,13 @@ object RecipeApiClient {
                 if(cancelRequest) return
 
                 if(response.code()==200) {
+                    Log.d(TAG,"Response code 200 for search API, response: ${response.body()}")
+
                     val list: List<Recipe>? = (response.body() as RecipeSearchResponse).recipes
                     list?.let {
                         if(pageNumber==1) {
                             mRecipes.postValue(list) // postValue- background thread, setValue- not on background Thread
+
                         } else {
 
                             var currentRecipes: List<Recipe>? = mRecipes.value
@@ -82,6 +85,7 @@ object RecipeApiClient {
                 }
 
             } catch (e: IOException) {
+                Log.d(TAG,"Exception: ${e.message}")
                 e.printStackTrace()
                 mRecipes.postValue(null)
             }

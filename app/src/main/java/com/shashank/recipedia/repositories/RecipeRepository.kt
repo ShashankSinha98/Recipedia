@@ -11,4 +11,9 @@ object RecipeRepository {
 
     fun getRecipes(): LiveData<List<Recipe>> = mRecipeApiClient.getRecipes()
 
+    fun searchRecipesApi(query: String, pageNumber: Int) {
+        val searchPageNumber = if(pageNumber==0) 1 else pageNumber
+
+        mRecipeApiClient.searchRecipesApi(query, searchPageNumber)
+    }
 }
