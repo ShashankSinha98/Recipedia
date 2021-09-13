@@ -39,7 +39,7 @@ class RecipeListActivity : BaseActivity() {
 
 
     private fun testRecipeRequest() {
-        val recipeApi: RecipeApi = ServiceGenerator.recipeAPi
+        val recipeApi: RecipeApi = ServiceGenerator.recipeApi
 
         /*val responseCall: Call<RecipeSearchResponse> = recipeApi.searchRecipes(
             query = "rice",

@@ -10,7 +10,7 @@ object ServiceGenerator {
         .baseUrl(Constants.BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
 
-    val recipeAPi: RecipeApi by lazy {
+    val recipeApi: RecipeApi by lazy {
         retrofitBuilder.build()
             .create(RecipeApi::class.java)
     }
