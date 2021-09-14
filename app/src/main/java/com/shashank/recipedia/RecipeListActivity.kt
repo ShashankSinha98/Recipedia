@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shashank.recipedia.adapters.OnRecipeListener
 import com.shashank.recipedia.adapters.RecipeRecyclerAdapter
 import com.shashank.recipedia.util.Testing
+import com.shashank.recipedia.util.VerticalSpacingItemDecorator
 import com.shashank.recipedia.viewmodels.RecipeListViewModel
 
 class RecipeListActivity : BaseActivity(), OnRecipeListener {
@@ -29,6 +30,12 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         initRecyclerView()
         initSearchView()
         subscribeObservers()
+
+        // To Do - Move this logic inside view model
+        if(!mRecipeListViewModel.isViewingRecipes()) {
+            // display search categories
+            displaySearchCategories()
+        }
 
     }
 
@@ -64,16 +71,25 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
     private fun initRecyclerView() {
         mAdapter = RecipeRecyclerAdapter(this)
+        mRecyclerView.addItemDecoration(VerticalSpacingItemDecorator(30))
         mRecyclerView.adapter = mAdapter
         mRecyclerView.layoutManager = LinearLayoutManager(this)
+
     }
 
 
     override fun onRecipeClick(position: Int) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onCategoryClick(category: String) {
-        TODO("Not yet implemented")
+        mAdapter.displayLoading()
+        mRecipeListViewModel.searchRecipesApi(category,1)
+    }
+
+
+    private fun displaySearchCategories() {
+        mRecipeListViewModel.setIsViewingRecipes(false)
+        mAdapter.displaySearchCategories()
     }
 }

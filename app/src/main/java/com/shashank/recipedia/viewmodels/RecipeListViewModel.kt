@@ -10,10 +10,19 @@ class RecipeListViewModel: ViewModel() {
 
     private val mRecipeRepository: RecipeRepository = RecipeRepository
 
+    private var mIsViewingRecipes: Boolean = false
+
 
     fun getRecipes(): LiveData<List<Recipe>> = mRecipeRepository.getRecipes()
 
     fun searchRecipesApi(query: String, pageNumber: Int) {
+        mIsViewingRecipes = true
         mRecipeRepository.searchRecipesApi(query, pageNumber)
+    }
+
+    fun isViewingRecipes() = mIsViewingRecipes
+
+    fun setIsViewingRecipes(isViewingRecipes: Boolean) {
+        mIsViewingRecipes = isViewingRecipes
     }
 }

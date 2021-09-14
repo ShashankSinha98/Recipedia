@@ -1,5 +1,6 @@
 package com.shashank.recipedia.adapters
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ class RecipeRecyclerAdapter(
     companion object {
         private val RECIPE_TYPE = 1
         private val LOADING_TYPE = 2
+        private val CATEGORY_TYPE = 3
     }
 
 
@@ -44,6 +46,13 @@ class RecipeRecyclerAdapter(
                 return LoadingViewHolder(view)
             }
 
+            CATEGORY_TYPE -> {
+                view = LayoutInflater.from(parent.context).inflate(R.layout.layout_category_list_item,
+                    parent, false)
+
+                return CategoryViewHolder(view, mOnRecipeListener)
+            }
+
             else -> {
                 view = LayoutInflater.from(parent.context).inflate(R.layout.layout_recipe_list_item,
                     parent, false)
@@ -57,11 +66,14 @@ class RecipeRecyclerAdapter(
 
         val itemViewType: Int = getItemViewType(position)
 
-        if(itemViewType == RECIPE_TYPE) {
-            val recipeViewHolder = holder as RecipeViewHolder
+        val requestOptions: RequestOptions = RequestOptions()
+            .placeholder(R.drawable.loading_img)
 
-            val requestOptions: RequestOptions = RequestOptions()
-                .placeholder(R.drawable.loading_img)
+
+
+        if(itemViewType == RECIPE_TYPE) {
+
+            val recipeViewHolder = holder as RecipeViewHolder
 
             recipeViewHolder.apply {
                 title.text = mRecipes[position].title?: Constants.TEXT_NOT_FOUND_MSG
@@ -75,12 +87,29 @@ class RecipeRecyclerAdapter(
                     .into(imageView)
             }
         }
+
+        else if(itemViewType == CATEGORY_TYPE) {
+
+            val categoryViewHolder = holder as CategoryViewHolder
+
+            val path: Uri = Uri.parse("android.resource://com.shashank.recipedia/drawable/${mRecipes[position].imageUrl}")
+
+            Glide.with(categoryViewHolder.itemView.context)
+                .setDefaultRequestOptions(requestOptions)
+                .load(path)
+                .into(categoryViewHolder.categoryImage)
+
+            categoryViewHolder.categoryTitle.text = mRecipes[position].title
+
+        }
     }
 
     override fun getItemCount(): Int = mRecipes.size
 
     override fun getItemViewType(position: Int): Int {
-        if(mRecipes.isNotEmpty() && mRecipes[position].title.equals("LOADING")) {
+        if(mRecipes.isNotEmpty() && mRecipes[position].socialRank==-1f) {
+            return CATEGORY_TYPE
+        } else if(mRecipes.isNotEmpty() && mRecipes[position].title.equals("LOADING")) {
             return LOADING_TYPE
         }
         return RECIPE_TYPE
@@ -102,6 +131,22 @@ class RecipeRecyclerAdapter(
             mRecipes = loadingList
             notifyDataSetChanged()
         }
+    }
+
+    fun displaySearchCategories() {
+        val categories = mutableListOf<Recipe>()
+
+        for(i in Constants.DEFAULT_SEARCH_CATEGORIES.indices) {
+            val recipe = Recipe()
+            recipe.title = Constants.DEFAULT_SEARCH_CATEGORIES[i]
+            recipe.imageUrl = Constants.DEFAULT_SEARCH_CATEGORY_IMAGES[i]
+            recipe.socialRank = -1f
+
+            categories.add(recipe)
+        }
+
+        mRecipes = categories
+        notifyDataSetChanged()
     }
 
     fun setRecipes(recipes: List<Recipe>) {
