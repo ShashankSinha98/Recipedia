@@ -11,7 +11,6 @@ import android.view.animation.Animation
 
 import android.view.animation.LinearInterpolator
 import android.view.animation.Transformation
-import com.shashank.recipedia.R
 
 
 class HorizontalDottedProgress : View {
@@ -37,7 +36,7 @@ class HorizontalDottedProgress : View {
         val paint = Paint()
 
         //set the color for the dot that you want to draw
-        paint.color = resources.getColor(R.color.colorAccent)
+        paint.color = Color.parseColor("#fd583f")
 
         //function to create dot
         createDot(canvas, paint)

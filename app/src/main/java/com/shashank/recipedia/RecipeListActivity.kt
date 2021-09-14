@@ -50,6 +50,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
+                    mAdapter.displayLoading()
                     mRecipeListViewModel.searchRecipesApi(it, 1)
                 }
                 return false
