@@ -25,4 +25,12 @@ class RecipeListViewModel: ViewModel() {
     fun setIsViewingRecipes(isViewingRecipes: Boolean) {
         mIsViewingRecipes = isViewingRecipes
     }
+
+    fun onBackPressed(): Boolean {
+        if(mIsViewingRecipes) {
+            mIsViewingRecipes = false
+            return false
+        }
+        return true
+    }
 }

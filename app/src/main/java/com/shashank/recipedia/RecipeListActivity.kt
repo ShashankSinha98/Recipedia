@@ -43,8 +43,10 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         mRecipeListViewModel.getRecipes().observe(this, Observer { recipes ->
 
             recipes?.let { recipes ->
-                Testing.printRecipes(TAG,recipes)
-                mAdapter.setRecipes(recipes)
+                if(mRecipeListViewModel.isViewingRecipes()) {
+                    Testing.printRecipes(TAG, recipes)
+                    mAdapter.setRecipes(recipes)
+                }
             }
         })
     }
@@ -91,5 +93,13 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private fun displaySearchCategories() {
         mRecipeListViewModel.setIsViewingRecipes(false)
         mAdapter.displaySearchCategories()
+    }
+
+    override fun onBackPressed() {
+        if(mRecipeListViewModel.onBackPressed()) {
+            super.onBackPressed()
+        } else {
+            displaySearchCategories()
+        }
     }
 }
