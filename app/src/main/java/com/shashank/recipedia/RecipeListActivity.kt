@@ -1,5 +1,6 @@
 package com.shashank.recipedia
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -15,12 +16,15 @@ import com.shashank.recipedia.adapters.RecipeRecyclerAdapter
 import com.shashank.recipedia.util.Testing
 import com.shashank.recipedia.util.VerticalSpacingItemDecorator
 import com.shashank.recipedia.viewmodels.RecipeListViewModel
+import com.shashank.recipedia.viewmodels.RecipeViewModel
 
 class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
     private val TAG = "RecipeListActivity"
 
     private lateinit var mRecipeListViewModel: RecipeListViewModel
+
+
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: RecipeRecyclerAdapter
     private lateinit var mSearchView: SearchView
@@ -29,8 +33,10 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_list)
 
-        mRecyclerView = findViewById(R.id.recipe_list)
         mRecipeListViewModel = ViewModelProvider(this).get(RecipeListViewModel::class.java)
+
+
+        mRecyclerView = findViewById(R.id.recipe_list)
         mSearchView = findViewById(R.id.search_view)
 
         initRecyclerView()
@@ -102,7 +108,9 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
 
     override fun onRecipeClick(position: Int) {
-
+        val intent = Intent(this, RecipeActivity::class.java)
+        intent.putExtra("recipe", mAdapter.getSelectedRecipe(position))
+        startActivity(intent)
     }
 
     override fun onCategoryClick(category: String) {

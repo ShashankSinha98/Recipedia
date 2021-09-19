@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.shashank.recipedia.AppExecutors
 import com.shashank.recipedia.models.Recipe
+import com.shashank.recipedia.requests.responses.RecipeResponse
 import com.shashank.recipedia.requests.responses.RecipeSearchResponse
 import com.shashank.recipedia.util.Constants
 import retrofit2.Call
@@ -19,9 +20,20 @@ object RecipeApiClient {
     private val TAG = "RecipeApiClient"
     private val mRecipes: MutableLiveData<List<Recipe>> = MutableLiveData()
     private var mRetrieveRecipesRunnable: RetrieveRecipesRunnable?= null
+    private var mRetrieveRecipeRunnable: RetrieveRecipeRunnable?= null
 
+    private val mRecipe: MutableLiveData<Recipe> = MutableLiveData()
+
+
+    // Get live data
     fun getRecipes(): LiveData<List<Recipe>> = mRecipes
 
+    fun getRecipe(): LiveData<Recipe> = mRecipe
+
+
+
+
+    // API call methods
     fun searchRecipesApi(query: String, pageNumber: Int) {
 
         if(mRetrieveRecipesRunnable!=null) mRetrieveRecipesRunnable = null
@@ -37,6 +49,25 @@ object RecipeApiClient {
 
         }, Constants.NETWORK_TIMEOUT, TimeUnit.MILLISECONDS)
     }
+
+    fun searchRecipeApi(recipeId: String) {
+
+        if(mRetrieveRecipeRunnable!=null) mRetrieveRecipeRunnable = null
+
+        mRetrieveRecipeRunnable = RetrieveRecipeRunnable(recipeId)
+
+        val handler: Future<*> = AppExecutors.networkIO().submit(mRetrieveRecipeRunnable)
+
+        AppExecutors.networkIO().schedule(Runnable {
+            // et user know => stop request - timeout occurred
+            handler.cancel(true)
+
+        }, Constants.NETWORK_TIMEOUT, TimeUnit.MILLISECONDS)
+    }
+
+
+
+
 
 
     private class RetrieveRecipesRunnable(
@@ -106,8 +137,62 @@ object RecipeApiClient {
     }
 
 
+    private class RetrieveRecipeRunnable(
+        private var recipeId: String,
+        var cancelRequest: Boolean= false
+    ): Runnable {
+
+
+        /**
+         * call.execute() runs the request on the current thread.
+         * call.enqueue(callback) runs the request on a background thread, and runs the callback on the current thread.
+         * */
+        override fun run() {
+
+            try {
+
+
+                val response: Response<*> = getRecipe(recipeId).execute()
+                if(cancelRequest) return
+
+                if(response.code()==200) {
+                    Log.d(TAG,"Response code 200 for search API, response: ${response.body()}")
+
+                    val recipe: Recipe? = (response.body() as RecipeResponse).recipe
+                    recipe?.let {
+                        mRecipe.postValue(recipe)
+                    }
+                } else {
+                    val error: String = response.errorBody().toString()
+                    Log.d(TAG,"run: $error")
+                    mRecipe.postValue(null)
+                }
+
+            } catch (e: IOException) {
+                Log.d(TAG,"Exception: ${e.message}")
+                e.printStackTrace()
+                mRecipe.postValue(null)
+            }
+        }
+
+        private fun getRecipe(recipeId: String): Call<RecipeResponse> =
+            ServiceGenerator.recipeApi.getRecipe(
+                recipeId= recipeId
+            )
+
+        fun cancelRequest() {
+            Log.d(TAG,"Cancelling the Search Request")
+            cancelRequest = true
+        }
+    }
+
+
     fun cancelRequest() {
         mRetrieveRecipesRunnable?.let {
+            it.cancelRequest()
+        }
+
+        mRetrieveRecipeRunnable?.let {
             it.cancelRequest()
         }
     }

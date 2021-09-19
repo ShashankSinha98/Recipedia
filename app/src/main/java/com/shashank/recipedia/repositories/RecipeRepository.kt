@@ -11,7 +11,13 @@ object RecipeRepository {
     private var mQuery: String?= null
     private var mPageNumber: Int?= null
 
+
     fun getRecipes(): LiveData<List<Recipe>> = mRecipeApiClient.getRecipes()
+
+    fun getRecipe(): LiveData<Recipe> = mRecipeApiClient.getRecipe()
+
+
+
 
     fun searchRecipesApi(query: String, pageNumber: Int) {
         val searchPageNumber = if(pageNumber==0) 1 else pageNumber
@@ -19,6 +25,10 @@ object RecipeRepository {
         mPageNumber = pageNumber
         mRecipeApiClient.searchRecipesApi(query, searchPageNumber)
     }
+
+    fun searchRecipeById(recipeId: String) { mRecipeApiClient.searchRecipeApi(recipeId) }
+
+
 
     fun searchNextPage() {
         if(mQuery!=null && mPageNumber!=null) {
