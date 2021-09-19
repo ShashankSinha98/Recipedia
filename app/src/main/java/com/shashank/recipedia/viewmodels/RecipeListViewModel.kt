@@ -23,6 +23,13 @@ class RecipeListViewModel: ViewModel() {
 
     fun isViewingRecipes() = mIsViewingRecipes
 
+
+    fun searchNextPage() {
+        if(!mIsPerformingQuery && mIsViewingRecipes) {
+            mRecipeRepository.searchNextPage()
+        }
+    }
+
     fun setIsViewingRecipes(isViewingRecipes: Boolean) {
         mIsViewingRecipes = isViewingRecipes
     }

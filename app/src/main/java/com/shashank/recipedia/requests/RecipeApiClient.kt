@@ -64,9 +64,11 @@ object RecipeApiClient {
                     val list: List<Recipe>? = (response.body() as RecipeSearchResponse).recipes
                     list?.let {
                         if(pageNumber==1) {
+                            Log.d(TAG,"PageNo: $pageNumber, result size: ${list.size}")
                             mRecipes.postValue(list) // postValue- background thread, setValue- not on background Thread
 
                         } else {
+                            Log.d(TAG,"PageNo: $pageNumber, result size: ${list.size}")
 
                             var currentRecipes: List<Recipe>? = mRecipes.value
                             currentRecipes?.let {

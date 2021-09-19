@@ -111,8 +111,12 @@ class RecipeRecyclerAdapter(
             return CATEGORY_TYPE
         } else if(mRecipes.isNotEmpty() && mRecipes[position].title.equals("LOADING")) {
             return LOADING_TYPE
+        } else if (position == mRecipes.size-1 && position != 0
+            && !mRecipes[position].title.equals("EXHAUSTED")) {
+            return LOADING_TYPE
+        } else {
+            return RECIPE_TYPE
         }
-        return RECIPE_TYPE
     }
 
     private fun isLoading(): Boolean {

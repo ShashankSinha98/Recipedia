@@ -8,13 +8,22 @@ import com.shashank.recipedia.requests.RecipeApiClient
 object RecipeRepository {
 
     private val mRecipeApiClient: RecipeApiClient = RecipeApiClient
+    private var mQuery: String?= null
+    private var mPageNumber: Int?= null
 
     fun getRecipes(): LiveData<List<Recipe>> = mRecipeApiClient.getRecipes()
 
     fun searchRecipesApi(query: String, pageNumber: Int) {
         val searchPageNumber = if(pageNumber==0) 1 else pageNumber
-
+        mQuery = query
+        mPageNumber = pageNumber
         mRecipeApiClient.searchRecipesApi(query, searchPageNumber)
+    }
+
+    fun searchNextPage() {
+        if(mQuery!=null && mPageNumber!=null) {
+            searchRecipesApi(mQuery!!, mPageNumber!! + 1)
+        }
     }
 
     fun cancelRequest() {

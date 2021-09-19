@@ -1,6 +1,7 @@
 package com.shashank.recipedia
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
@@ -84,6 +85,18 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         mRecyclerView.addItemDecoration(VerticalSpacingItemDecorator(30))
         mRecyclerView.adapter = mAdapter
         mRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+
+                if(!mRecyclerView.canScrollVertically(1)) {
+                    // search the next page
+                    Log.d(TAG, "Search next page ")
+                    mRecipeListViewModel.searchNextPage()
+                }
+            }
+        })
 
     }
 
