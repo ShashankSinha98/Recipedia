@@ -16,7 +16,8 @@ object RecipeRepository {
 
     fun getRecipeDetail(): LiveData<RecipeDetail> = mRecipeApiClient.getRecipeDetail()
 
-
+    fun isRecipeDetailRequestTimedOut(): LiveData<Boolean> =
+        mRecipeApiClient.isRecipeDetailRequestTimedOut()
 
 
     fun searchRecipesApi(query: String, pageNumber: Int) {
@@ -26,7 +27,7 @@ object RecipeRepository {
         mRecipeApiClient.searchRecipesApi(query, searchPageNumber)
     }
 
-    fun searchRecipeById(recipeId: String) { mRecipeApiClient.searchRecipeApi(recipeId) }
+    fun searchRecipeById(recipeId: String) { mRecipeApiClient.searchRecipeById(recipeId) }
 
 
 

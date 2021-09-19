@@ -24,12 +24,15 @@ object RecipeApiClient {
     private var mRetrieveRecipeRunnable: RetrieveRecipeRunnable?= null
 
     private val mRecipeDetail: MutableLiveData<RecipeDetail> = MutableLiveData()
+    private val mRecipeDetailRequestTimeout: MutableLiveData<Boolean> = MutableLiveData()
 
 
     // Get live data
     fun getRecipes(): LiveData<List<Recipe>> = mRecipes
 
     fun getRecipeDetail(): LiveData<RecipeDetail> = mRecipeDetail
+
+    fun isRecipeDetailRequestTimedOut(): LiveData<Boolean> = mRecipeDetailRequestTimeout
 
 
 
@@ -51,7 +54,7 @@ object RecipeApiClient {
         }, Constants.NETWORK_TIMEOUT, TimeUnit.MILLISECONDS)
     }
 
-    fun searchRecipeApi(recipeId: String) {
+    fun searchRecipeById(recipeId: String) {
 
         if(mRetrieveRecipeRunnable!=null) mRetrieveRecipeRunnable = null
 
@@ -59,8 +62,10 @@ object RecipeApiClient {
 
         val handler: Future<*> = AppExecutors.networkIO().submit(mRetrieveRecipeRunnable)
 
+        mRecipeDetailRequestTimeout.value = false
         AppExecutors.networkIO().schedule(Runnable {
             // et user know => stop request - timeout occurred
+            mRecipeDetailRequestTimeout.postValue(true)
             handler.cancel(true)
 
         }, Constants.NETWORK_TIMEOUT, TimeUnit.MILLISECONDS)

@@ -67,9 +67,46 @@ class RecipeActivity: BaseActivity() {
             recipeDetail?.let {
                 if(recipeDetail.recipeId.equals(mRecipeViewModel.getRecipeId())) {
                     setRecipeProperties(recipeDetail)
+                    mRecipeViewModel.setRetrievedRecipe(true)
                 }
             }
         })
+
+
+        mRecipeViewModel.isRecipeDetailRequestTimedOut().observe(this, Observer { timedOut ->
+
+            if(timedOut && !mRecipeViewModel.didRetrievedRecipe()) {
+                Log.d(TAG,"onChanged: Timed Out")
+                displayErrorScreen("Error retrieving data. Check network connection")
+            }
+        })
+    }
+
+    private fun displayErrorScreen(errorMessage: String) {
+        mRecipeTitle.text = "Error Retrieving Recipe.."
+        mRecipeRank.text = ""
+        val textView = TextView(this)
+        if(!errorMessage.isBlank()) {
+            textView.text = errorMessage
+        } else {
+            textView.text = "ERROR"
+        }
+        textView.textSize  = 15F
+        textView.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        mRecipeIngredientsContainer.addView(textView)
+
+        val requestOptions: RequestOptions = RequestOptions()
+            .placeholder(R.drawable.loading_img)
+
+        Glide.with(this)
+            .setDefaultRequestOptions(requestOptions)
+            .load(R.drawable.img_not_found)
+            .into(mRecipeImage)
+
+        showParent()
+        showProgressBar(false)
     }
 
 
