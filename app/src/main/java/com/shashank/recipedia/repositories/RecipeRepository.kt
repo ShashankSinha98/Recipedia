@@ -1,8 +1,8 @@
 package com.shashank.recipedia.repositories
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.shashank.recipedia.models.Recipe
+import com.shashank.recipedia.models.RecipeDetail
 import com.shashank.recipedia.requests.RecipeApiClient
 
 object RecipeRepository {
@@ -14,7 +14,7 @@ object RecipeRepository {
 
     fun getRecipes(): LiveData<List<Recipe>> = mRecipeApiClient.getRecipes()
 
-    fun getRecipe(): LiveData<Recipe> = mRecipeApiClient.getRecipe()
+    fun getRecipeDetail(): LiveData<RecipeDetail> = mRecipeApiClient.getRecipeDetail()
 
 
 

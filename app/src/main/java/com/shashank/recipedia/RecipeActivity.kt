@@ -2,14 +2,20 @@ package com.shashank.recipedia
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.shashank.recipedia.models.Recipe
+import com.shashank.recipedia.models.RecipeDetail
 import com.shashank.recipedia.viewmodels.RecipeViewModel
+import kotlin.math.roundToInt
 
 class RecipeActivity: BaseActivity() {
 
@@ -37,6 +43,7 @@ class RecipeActivity: BaseActivity() {
         mRecipeIngredientsContainer = findViewById(R.id.ingredients_container)
         mScrollView = findViewById(R.id.parent)
 
+        showProgressBar(true)
         getIncomingIntent()
         subscribeObservers()
     }
@@ -55,18 +62,49 @@ class RecipeActivity: BaseActivity() {
 
 
     private fun subscribeObservers() {
-        mRecipeViewModel.getRecipe().observe(this, Observer { recipe ->
+        mRecipeViewModel.getRecipeDetail().observe(this, Observer { recipeDetail ->
 
-            recipe?.let {
-                Log.d(TAG,"onChanged: ${recipe.title}")
-
-                recipe.ingredients?.let {
-                    for(ingredient in recipe.ingredients!!) {
-                        Log.d(TAG,"onChanged: $ingredient")
-                    }
+            recipeDetail?.let {
+                if(recipeDetail.recipeId.equals(mRecipeViewModel.getRecipeId())) {
+                    setRecipeProperties(recipeDetail)
                 }
-
             }
         })
     }
+
+
+    private fun setRecipeProperties(recipe: RecipeDetail?) {
+        recipe?.let {
+            val requestOptions: RequestOptions = RequestOptions()
+                .placeholder(R.drawable.loading_img)
+
+            Glide.with(this)
+                .setDefaultRequestOptions(requestOptions)
+                .load(recipe.imageUrl)
+                .into(mRecipeImage)
+
+            mRecipeTitle.text = recipe.title?:"NA"
+            mRecipeRank.text = (recipe.socialRank ?: 0f).roundToInt().toString()
+
+            mRecipeIngredientsContainer.removeAllViews()
+            for(ingredient in recipe.ingredients?: listOf()) {
+                val textView = TextView(this)
+                textView.text = ingredient
+                textView.textSize = 15F
+                textView.layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT)
+
+                mRecipeIngredientsContainer.addView(textView)
+            }
+
+            showParent()
+            showProgressBar(false)
+        }
+    }
+
+    private fun showParent() {
+        mScrollView.visibility = View.VISIBLE
+    }
+
 }

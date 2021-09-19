@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.shashank.recipedia.AppExecutors
 import com.shashank.recipedia.models.Recipe
+import com.shashank.recipedia.models.RecipeDetail
 import com.shashank.recipedia.requests.responses.RecipeResponse
 import com.shashank.recipedia.requests.responses.RecipeSearchResponse
 import com.shashank.recipedia.util.Constants
@@ -22,13 +23,13 @@ object RecipeApiClient {
     private var mRetrieveRecipesRunnable: RetrieveRecipesRunnable?= null
     private var mRetrieveRecipeRunnable: RetrieveRecipeRunnable?= null
 
-    private val mRecipe: MutableLiveData<Recipe> = MutableLiveData()
+    private val mRecipeDetail: MutableLiveData<RecipeDetail> = MutableLiveData()
 
 
     // Get live data
     fun getRecipes(): LiveData<List<Recipe>> = mRecipes
 
-    fun getRecipe(): LiveData<Recipe> = mRecipe
+    fun getRecipeDetail(): LiveData<RecipeDetail> = mRecipeDetail
 
 
 
@@ -156,22 +157,23 @@ object RecipeApiClient {
                 if(cancelRequest) return
 
                 if(response.code()==200) {
-                    Log.d(TAG,"Response code 200 for search API, response: ${response.body()}")
+                    Log.d(TAG,"Response code 200 for get API, response: ${response.body()}")
 
-                    val recipe: Recipe? = (response.body() as RecipeResponse).recipe
-                    recipe?.let {
-                        mRecipe.postValue(recipe)
+                    val recipeDetail: RecipeDetail? = (response.body() as RecipeResponse).recipeDetail
+                    recipeDetail?.let {
+                        Log.d(TAG,"new recipe value posted")
+                        mRecipeDetail.postValue(recipeDetail)
                     }
                 } else {
                     val error: String = response.errorBody().toString()
                     Log.d(TAG,"run: $error")
-                    mRecipe.postValue(null)
+                    mRecipeDetail.postValue(null)
                 }
 
             } catch (e: IOException) {
                 Log.d(TAG,"Exception: ${e.message}")
                 e.printStackTrace()
-                mRecipe.postValue(null)
+                mRecipeDetail.postValue(null)
             }
         }
 
