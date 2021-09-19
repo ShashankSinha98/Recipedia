@@ -1,7 +1,10 @@
 package com.shashank.recipedia
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +22,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private lateinit var mRecipeListViewModel: RecipeListViewModel
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: RecipeRecyclerAdapter
+    private lateinit var mSearchView: SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +30,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
         mRecyclerView = findViewById(R.id.recipe_list)
         mRecipeListViewModel = ViewModelProvider(this).get(RecipeListViewModel::class.java)
+        mSearchView = findViewById(R.id.search_view)
 
         initRecyclerView()
         initSearchView()
@@ -37,6 +42,8 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
             displaySearchCategories()
         }
 
+        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
+
     }
 
     private fun subscribeObservers() {
@@ -45,6 +52,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
             recipes?.let { recipes ->
                 if(mRecipeListViewModel.isViewingRecipes()) {
                     Testing.printRecipes(TAG, recipes)
+                    mRecipeListViewModel.setIsPerformingQuery(false)
                     mAdapter.setRecipes(recipes)
                 }
             }
@@ -54,13 +62,13 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
 
     private fun initSearchView() {
-        val searchView: SearchView = findViewById(R.id.search_view)
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        mSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     mAdapter.displayLoading()
                     mRecipeListViewModel.searchRecipesApi(it, 1)
+                    mSearchView.clearFocus()
                 }
                 return false
             }
@@ -87,6 +95,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     override fun onCategoryClick(category: String) {
         mAdapter.displayLoading()
         mRecipeListViewModel.searchRecipesApi(category,1)
+        mSearchView.clearFocus()
     }
 
 
@@ -101,5 +110,19 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         } else {
             displaySearchCategories()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.recipe_search_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        if(item.itemId==R.id.action_categories) {
+            displaySearchCategories()
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 }

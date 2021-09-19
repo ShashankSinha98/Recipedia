@@ -97,9 +97,16 @@ object RecipeApiClient {
                 page = pageNumber.toString()
             )
 
-        private fun cancelRequest() {
+        fun cancelRequest() {
             Log.d(TAG,"Cancelling the Search Request")
             cancelRequest = true
+        }
+    }
+
+
+    fun cancelRequest() {
+        mRetrieveRecipesRunnable?.let {
+            it.cancelRequest()
         }
     }
 }

@@ -16,4 +16,8 @@ object RecipeRepository {
 
         mRecipeApiClient.searchRecipesApi(query, searchPageNumber)
     }
+
+    fun cancelRequest() {
+        mRecipeApiClient.cancelRequest()
+    }
 }
