@@ -20,10 +20,11 @@ class RecipeRecyclerAdapter(
         private val RECIPE_TYPE = 1
         private val LOADING_TYPE = 2
         private val CATEGORY_TYPE = 3
+        private val EXHAUSTED_TYPE = 4
     }
 
 
-    private var mRecipes: List<Recipe> = listOf<Recipe>()
+    private var mRecipes: MutableList<Recipe> = mutableListOf<Recipe>()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -44,6 +45,14 @@ class RecipeRecyclerAdapter(
                     parent, false)
 
                 return LoadingViewHolder(view)
+            }
+
+
+            EXHAUSTED_TYPE -> {
+                view = LayoutInflater.from(parent.context).inflate(R.layout.layout_search_exhausted,
+                    parent, false)
+
+                return SearchExhaustedViewHolder(view)
             }
 
             CATEGORY_TYPE -> {
@@ -111,11 +120,33 @@ class RecipeRecyclerAdapter(
             return CATEGORY_TYPE
         } else if(mRecipes.isNotEmpty() && mRecipes[position].title.equals("LOADING")) {
             return LOADING_TYPE
+        } else if(mRecipes.isNotEmpty() && mRecipes[position].title.equals("EXHAUSTED")) {
+            return EXHAUSTED_TYPE
         } else if (position == mRecipes.size-1 && position != 0
             && !mRecipes[position].title.equals("EXHAUSTED")) {
             return LOADING_TYPE
         } else {
             return RECIPE_TYPE
+        }
+    }
+
+    fun setQueryExhausted() {
+        hideLoading()
+        val exhaustedRecipe = Recipe()
+        exhaustedRecipe.title = "EXHAUSTED"
+        mRecipes.add(exhaustedRecipe)
+        notifyDataSetChanged()
+    }
+
+
+    private fun hideLoading() {
+        if(isLoading()) {
+            for(recipe in mRecipes) {
+                if(recipe.title.equals("LOADING")) {
+                    mRecipes.remove(recipe)
+                }
+            }
+            notifyDataSetChanged()
         }
     }
 
@@ -131,9 +162,10 @@ class RecipeRecyclerAdapter(
         if(!isLoading()) {
             val recipe = Recipe()
             recipe.title = "LOADING"
-            val loadingList = listOf<Recipe>(recipe)
-            mRecipes = loadingList
+            mRecipes.add(recipe)
             notifyDataSetChanged()
+            //val loadingList = mutableListOf<Recipe>(recipe)
+            // mRecipes = loadingList
         }
     }
 
@@ -153,7 +185,7 @@ class RecipeRecyclerAdapter(
         notifyDataSetChanged()
     }
 
-    fun setRecipes(recipes: List<Recipe>) {
+    fun setRecipes(recipes: MutableList<Recipe>) {
         mRecipes = recipes
         notifyDataSetChanged()
     }

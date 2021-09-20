@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/sinha/AndroidStudioProjects/Recipedia/app/src/main/res/drawable/ic_mood_bad_black_24dp.xml" value="0.2203125" />
         <entry key="..\:/Users/sinha/AndroidStudioProjects/Recipedia/app/src/main/res/layout/activity_base.xml" value="0.16576086956521738" />
         <entry key="..\:/Users/sinha/AndroidStudioProjects/Recipedia/app/src/main/res/layout/activity_main.xml" value="0.19010416666666666" />
         <entry key="..\:/Users/sinha/AndroidStudioProjects/Recipedia/app/src/main/res/layout/activity_recipe.xml" value="0.20416666666666666" />
@@ -10,6 +11,7 @@
         <entry key="..\:/Users/sinha/AndroidStudioProjects/Recipedia/app/src/main/res/layout/layout_category_list_item.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/sinha/AndroidStudioProjects/Recipedia/app/src/main/res/layout/layout_loading_list_item.xml" value="0.33" />
         <entry key="..\:/Users/sinha/AndroidStudioProjects/Recipedia/app/src/main/res/layout/layout_recipe_list_item.xml" value="0.16077898550724637" />
+        <entry key="..\:/Users/sinha/AndroidStudioProjects/Recipedia/app/src/main/res/layout/layout_search_exhausted.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/sinha/AndroidStudioProjects/Recipedia/app/src/main/res/menu/recipe_search_menu.xml" value="0.20416666666666666" />
       </map>
     </option>

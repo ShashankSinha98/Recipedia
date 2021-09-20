@@ -12,7 +12,7 @@ data class RecipeSearchResponse(
 
     @SerializedName("recipes")
     @Expose()
-    var recipes: List<Recipe>?= null
+    var recipes: MutableList<Recipe>?= null
 ) {
 
 }

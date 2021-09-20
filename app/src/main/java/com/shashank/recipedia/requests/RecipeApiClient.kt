@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 object RecipeApiClient {
 
     private val TAG = "RecipeApiClient"
-    private val mRecipes: MutableLiveData<List<Recipe>> = MutableLiveData()
+    private val mRecipes: MutableLiveData<MutableList<Recipe>> = MutableLiveData()
     private var mRetrieveRecipesRunnable: RetrieveRecipesRunnable?= null
     private var mRetrieveRecipeRunnable: RetrieveRecipeRunnable?= null
 
@@ -28,7 +28,7 @@ object RecipeApiClient {
 
 
     // Get live data
-    fun getRecipes(): LiveData<List<Recipe>> = mRecipes
+    fun getRecipes(): LiveData<MutableList<Recipe>> = mRecipes
 
     fun getRecipeDetail(): LiveData<RecipeDetail> = mRecipeDetail
 
@@ -98,7 +98,7 @@ object RecipeApiClient {
                 if(response.code()==200) {
                     Log.d(TAG,"Response code 200 for search API, response: ${response.body()}")
 
-                    val list: List<Recipe>? = (response.body() as RecipeSearchResponse).recipes
+                    val list: MutableList<Recipe>? = (response.body() as RecipeSearchResponse).recipes
                     list?.let {
                         if(pageNumber==1) {
                             Log.d(TAG,"PageNo: $pageNumber, result size: ${list.size}")

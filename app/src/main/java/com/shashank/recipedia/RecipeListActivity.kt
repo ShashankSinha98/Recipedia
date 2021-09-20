@@ -64,6 +64,13 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
                 }
             }
         })
+
+        mRecipeListViewModel.isQueryExhausted().observe(this, Observer { isQueryExhausted ->
+            if(isQueryExhausted) {
+                Log.d(TAG,"onChanged: Query is exhausted")
+                mAdapter.setQueryExhausted()
+            }
+        })
     }
 
 

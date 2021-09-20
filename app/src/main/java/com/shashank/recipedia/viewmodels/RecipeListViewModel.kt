@@ -13,7 +13,10 @@ class RecipeListViewModel: ViewModel() {
     private var mIsPerformingQuery: Boolean = false
 
 
-    fun getRecipes(): LiveData<List<Recipe>> = mRecipeRepository.getRecipes()
+    fun getRecipes(): LiveData<MutableList<Recipe>> = mRecipeRepository.getRecipes()
+
+    fun isQueryExhausted(): LiveData<Boolean> = mRecipeRepository.isQueryExhausted()
+
 
     fun searchRecipesApi(query: String, pageNumber: Int) {
         mIsViewingRecipes = true
@@ -25,7 +28,8 @@ class RecipeListViewModel: ViewModel() {
 
 
     fun searchNextPage() {
-        if(!mIsPerformingQuery && mIsViewingRecipes) {
+        if(!mIsPerformingQuery && mIsViewingRecipes
+            && isQueryExhausted().value==false) {
             mRecipeRepository.searchNextPage()
         }
     }
