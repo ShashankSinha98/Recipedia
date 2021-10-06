@@ -14,14 +14,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.shashank.recipedia.models.Recipe
 import com.shashank.recipedia.models.RecipeDetail
-import com.shashank.recipedia.viewmodels.RecipeViewModel
 import kotlin.math.roundToInt
 
 class RecipeActivity: BaseActivity() {
 
     private val TAG = "RecipeActivity"
-
-    private lateinit var mRecipeViewModel: RecipeViewModel
 
     private lateinit var mRecipeImage: AppCompatImageView
     private lateinit var mRecipeTitle: TextView
@@ -35,7 +32,6 @@ class RecipeActivity: BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe)
 
-        mRecipeViewModel = ViewModelProvider(this).get(RecipeViewModel::class.java)
 
         mRecipeImage  = findViewById(R.id.recipe_image)
         mRecipeTitle  = findViewById(R.id.recipe_title)
@@ -45,7 +41,6 @@ class RecipeActivity: BaseActivity() {
 
         showProgressBar(true)
         getIncomingIntent()
-        subscribeObservers()
     }
 
 
@@ -54,91 +49,10 @@ class RecipeActivity: BaseActivity() {
         if(intent.hasExtra("recipe")) {
             val recipe: Recipe? = intent.getParcelableExtra<Recipe>("recipe")
             Log.d(TAG,"getIncomingIntent: ${recipe?.title}")
-            recipe?.recipeId?.let {
-                mRecipeViewModel.searchRecipeById(recipe.recipeId!!)
-            }
+
         }
     }
 
-
-    private fun subscribeObservers() {
-        mRecipeViewModel.getRecipeDetail().observe(this, Observer { recipeDetail ->
-
-            recipeDetail?.let {
-                if(recipeDetail.recipeId.equals(mRecipeViewModel.getRecipeId())) {
-                    setRecipeProperties(recipeDetail)
-                    mRecipeViewModel.setRetrievedRecipe(true)
-                }
-            }
-        })
-
-
-        mRecipeViewModel.isRecipeDetailRequestTimedOut().observe(this, Observer { timedOut ->
-
-            if(timedOut && !mRecipeViewModel.didRetrievedRecipe()) {
-                Log.d(TAG,"onChanged: Timed Out")
-                displayErrorScreen("Error retrieving data. Check network connection")
-            }
-        })
-    }
-
-    private fun displayErrorScreen(errorMessage: String) {
-        mRecipeTitle.text = "Error Retrieving Recipe.."
-        mRecipeRank.text = ""
-        val textView = TextView(this)
-        if(!errorMessage.isBlank()) {
-            textView.text = errorMessage
-        } else {
-            textView.text = "ERROR"
-        }
-        textView.textSize  = 15F
-        textView.layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        mRecipeIngredientsContainer.addView(textView)
-
-        val requestOptions: RequestOptions = RequestOptions()
-            .placeholder(R.drawable.loading_img)
-
-        Glide.with(this)
-            .setDefaultRequestOptions(requestOptions)
-            .load(R.drawable.img_not_found)
-            .into(mRecipeImage)
-
-        showParent()
-        showProgressBar(false)
-    }
-
-
-    private fun setRecipeProperties(recipe: RecipeDetail?) {
-        recipe?.let {
-            val requestOptions: RequestOptions = RequestOptions()
-                .placeholder(R.drawable.loading_img)
-
-            Glide.with(this)
-                .setDefaultRequestOptions(requestOptions)
-                .load(recipe.imageUrl)
-                .into(mRecipeImage)
-
-            mRecipeTitle.text = recipe.title?:"NA"
-            mRecipeRank.text = (recipe.socialRank ?: 0f).roundToInt().toString()
-
-            mRecipeIngredientsContainer.removeAllViews()
-            for(ingredient in recipe.ingredients?: listOf()) {
-                val textView = TextView(this)
-                textView.text = ingredient
-                textView.textSize = 15F
-                textView.layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT)
-
-                mRecipeIngredientsContainer.addView(textView)
-            }
-
-            showParent()
-            showProgressBar(false)
-        }
-    }
 
     private fun showParent() {
         mScrollView.visibility = View.VISIBLE

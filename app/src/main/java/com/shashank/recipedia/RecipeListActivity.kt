@@ -16,7 +16,6 @@ import com.shashank.recipedia.adapters.RecipeRecyclerAdapter
 import com.shashank.recipedia.util.Testing
 import com.shashank.recipedia.util.VerticalSpacingItemDecorator
 import com.shashank.recipedia.viewmodels.RecipeListViewModel
-import com.shashank.recipedia.viewmodels.RecipeViewModel
 
 class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
@@ -41,37 +40,13 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
         initRecyclerView()
         initSearchView()
-        subscribeObservers()
 
-        // To Do - Move this logic inside view model
-        if(!mRecipeListViewModel.isViewingRecipes()) {
-            // display search categories
-            displaySearchCategories()
-        }
 
         setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
 
     }
 
-    private fun subscribeObservers() {
-        mRecipeListViewModel.getRecipes().observe(this, Observer { recipes ->
 
-            recipes?.let { recipes ->
-                if(mRecipeListViewModel.isViewingRecipes()) {
-                    Testing.printRecipes(TAG, recipes)
-                    mRecipeListViewModel.setIsPerformingQuery(false)
-                    mAdapter.setRecipes(recipes)
-                }
-            }
-        })
-
-        mRecipeListViewModel.isQueryExhausted().observe(this, Observer { isQueryExhausted ->
-            if(isQueryExhausted) {
-                Log.d(TAG,"onChanged: Query is exhausted")
-                mAdapter.setQueryExhausted()
-            }
-        })
-    }
 
 
 
@@ -79,11 +54,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
         mSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let {
-                    mAdapter.displayLoading()
-                    mRecipeListViewModel.searchRecipesApi(it, 1)
-                    mSearchView.clearFocus()
-                }
+
                 return false
             }
 
@@ -99,17 +70,6 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         mRecyclerView.adapter = mAdapter
         mRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-
-                if(!mRecyclerView.canScrollVertically(1)) {
-                    // search the next page
-                    Log.d(TAG, "Search next page ")
-                    mRecipeListViewModel.searchNextPage()
-                }
-            }
-        })
 
     }
 
@@ -121,36 +81,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     }
 
     override fun onCategoryClick(category: String) {
-        mAdapter.displayLoading()
-        mRecipeListViewModel.searchRecipesApi(category,1)
-        mSearchView.clearFocus()
+
     }
 
-
-    private fun displaySearchCategories() {
-        mRecipeListViewModel.setIsViewingRecipes(false)
-        mAdapter.displaySearchCategories()
-    }
-
-    override fun onBackPressed() {
-        if(mRecipeListViewModel.onBackPressed()) {
-            super.onBackPressed()
-        } else {
-            displaySearchCategories()
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.recipe_search_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        if(item.itemId==R.id.action_categories) {
-            displaySearchCategories()
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
 }
