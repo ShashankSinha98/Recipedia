@@ -40,14 +40,34 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
         initRecyclerView()
         initSearchView()
-
+        subscribeObservers()
 
         setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
 
     }
 
 
+    private fun subscribeObservers() {
+        mRecipeListViewModel.getViewState()?.observe(this, Observer { viewState ->
 
+            viewState?.let {
+                when(viewState) {
+
+                    RecipeListViewModel.ViewState.RECIPES -> {
+                        // recipes will show automatically from another observer
+                    }
+
+                    RecipeListViewModel.ViewState.CATEGORIES -> {
+                        displaySearchCategories()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun displaySearchCategories() {
+        mAdapter.displaySearchCategories()
+    }
 
 
     private fun initSearchView() {

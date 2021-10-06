@@ -11,4 +11,17 @@ import com.shashank.recipedia.repositories.RecipeRepository
 class RecipeListViewModel(application: Application): AndroidViewModel(application) {
 
     private val TAG = "RecipeListViewModel"
+
+    enum class ViewState {CATEGORIES, RECIPES}
+
+    private var viewState: MutableLiveData<ViewState>?= null
+
+    init {
+        if(viewState==null) {
+            viewState = MutableLiveData()
+            viewState?.value = ViewState.CATEGORIES
+        }
+    }
+
+    fun getViewState(): LiveData<ViewState>? = viewState
 }
