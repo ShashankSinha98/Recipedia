@@ -1,15 +1,47 @@
 package com.shashank.recipedia.util
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.shashank.recipedia.AppExecutors
 import com.shashank.recipedia.requests.responses.ApiResponse
 
 // CacheObject: Type for resource data (db cache)
 // RequestObject: Type for API response (network request)
 
-abstract class NetworkBoundResource<CacheObject, RequestObject> {
+abstract class NetworkBoundResource<CacheObject, RequestObject>(
+    private val appExecutors: AppExecutors
+) {
+    private val results: MediatorLiveData<Resource<CacheObject>> = MediatorLiveData()
 
-    private val results: MutableLiveData<Resource<CacheObject>> = MutableLiveData()
+    init {
+        // update livedata for laoding status
+        results.value = Resource.loading(null) as Resource<CacheObject>
+
+        // observe livedata source from local db
+        val dbSource: LiveData<CacheObject> = loadFromDB()
+
+        results.addSource(dbSource, Observer { cacheObject ->
+            results.removeSource(dbSource) // stop observing this data source
+
+            if(shouldFetch(cacheObject)) {
+                // get data from network
+            } else {
+                results.addSource(dbSource, Observer { cacheObject ->
+                    setValue(Resource.success(cacheObject))
+                })
+
+            }
+        })
+    }
+
+    private fun setValue(newValue: Resource<CacheObject>) {
+        if(results.value != newValue) {
+            results.value = newValue
+        }
+    }
+
 
     // called to save the results of API response into db
     protected abstract fun saveCallResult(item: RequestObject)
