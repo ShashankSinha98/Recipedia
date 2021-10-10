@@ -31,4 +31,6 @@ abstract class RecipeDatabase: RoomDatabase() {
         }
     }
 
+    abstract fun getRecipeDao(): RecipeDao
+
 }

@@ -46,7 +46,7 @@ data class Recipe(
     var socialRank: Float?= null,
 
     @ColumnInfo(name="timestamp")
-    var timestamp: Int
+    var timestamp: Int?= null
 
 ) : Parcelable {
 
