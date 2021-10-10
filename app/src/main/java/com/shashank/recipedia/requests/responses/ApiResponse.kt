@@ -3,6 +3,7 @@ package com.shashank.recipedia.requests.responses
 import retrofit2.Response
 import java.io.IOException
 
+// wrapper class for retrofit responses
 open class ApiResponse<T> {
 
     // for error
@@ -28,16 +29,20 @@ open class ApiResponse<T> {
 
         } else {
             var errorMsg = ""
-            try {
-                errorMsg = response.errorBody().toString()
+            errorMsg = try {
+                response.errorBody().toString()
             } catch (e: IOException) {
                 e.printStackTrace()
-                errorMsg = response.message()
+                response.message()
             }
 
             return ApiErrorResponse(errorMsg)
         }
     }
+
+
+
+    // 3 diff types of API Responses
 
     class ApiSuccessResponse<T>(private val body: T): ApiResponse<T>() {
         fun getBody() = body

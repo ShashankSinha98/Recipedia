@@ -17,10 +17,13 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(
     private val TAG = "NetworkBoundResource"
 
 
+    // Our single source of data
     private val results: MediatorLiveData<Resource<CacheObject>> = MediatorLiveData()
 
+
+
     init {
-        // update livedata for laoding status
+        // update livedata for loading status
         results.value = Resource.loading(null) as Resource<CacheObject>
 
         // observe livedata source from local db
