@@ -20,6 +20,8 @@ import com.shashank.recipedia.util.Resource
 
 class RecipeRepository {
 
+    private val TAG = "RecipeRepository"
+
     private constructor (context: Context) {
         recipeDao = RecipeDatabase.getInstance(context).getRecipeDao()
     }
@@ -43,7 +45,23 @@ class RecipeRepository {
         return object: NetworkBoundResource<List<Recipe>, RecipeSearchResponse>(AppExecutors) {
 
             override fun saveCallResult(item: RecipeSearchResponse) {
-                TODO("Not yet implemented")
+                item.recipes?.let { recipes ->
+
+                    for((index, rowId) in recipeDao.insertRecipes(*recipes.toTypedArray()).withIndex()) {
+                        if(rowId==-1L) {
+                            Log.d(TAG,"saveCallResult: CONFLICT.. This recipe is already in cache")
+                            // if the recipe already exists... I don't want to set the ingredients or timestamp b/c
+                            // they will be erased
+                            recipeDao.updateRecipe(
+                                recipes[index].recipeId,
+                                recipes[index].title,
+                                recipes[index].publisher,
+                                recipes[index].imageUrl,
+                                recipes[index].socialRank,
+                            )
+                        }
+                    }
+                }
             }
 
             override fun shouldFetch(data: List<Recipe>): Boolean {

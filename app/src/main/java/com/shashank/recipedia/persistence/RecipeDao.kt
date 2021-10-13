@@ -11,7 +11,7 @@ import com.shashank.recipedia.models.Recipe
 @Dao
 interface RecipeDao {
 
-    @Insert(onConflict = IGNORE)
+    @Insert(onConflict = IGNORE) // ret -1 if recipe already exists in db
     fun insertRecipes(vararg recipe: Recipe): Array<Long>
 
     @Insert(onConflict = REPLACE)
@@ -19,11 +19,11 @@ interface RecipeDao {
 
     @Query("UPDATE recipes SET title=:title, publisher=:publisher, imageUrl=:image_url, socialRank=:social_rank WHERE recipeId=:recipe_id")
     fun updateRecipe(
-        recipe_id: String,
-        title: String,
-        publisher: String,
-        image_url: String,
-        social_rank: Float
+        recipe_id: String?,
+        title: String?,
+        publisher: String?,
+        image_url: String?,
+        social_rank: Float?
     )
 
 
