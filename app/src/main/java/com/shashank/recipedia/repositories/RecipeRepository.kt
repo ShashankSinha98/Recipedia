@@ -12,6 +12,7 @@ import com.shashank.recipedia.models.RecipeDetail
 import com.shashank.recipedia.persistence.RecipeDao
 import com.shashank.recipedia.persistence.RecipeDatabase
 import com.shashank.recipedia.requests.RecipeApiClient
+import com.shashank.recipedia.requests.ServiceGenerator
 import com.shashank.recipedia.requests.responses.ApiResponse
 import com.shashank.recipedia.requests.responses.RecipeSearchResponse
 import com.shashank.recipedia.util.NetworkBoundResource
@@ -54,7 +55,7 @@ class RecipeRepository {
             }
 
             override fun createCall(): LiveData<ApiResponse<RecipeSearchResponse>> {
-                TODO("Not yet implemented")
+                return ServiceGenerator.recipeApi.searchRecipes(query, pageNumber.toString())
             }
 
         }.getAsLiveData()

@@ -1,5 +1,7 @@
 package com.shashank.recipedia.requests
 
+import androidx.lifecycle.LiveData
+import com.shashank.recipedia.requests.responses.ApiResponse
 import com.shashank.recipedia.requests.responses.RecipeResponse
 import com.shashank.recipedia.requests.responses.RecipeSearchResponse
 import retrofit2.Call
@@ -13,12 +15,12 @@ interface RecipeApi {
     fun searchRecipes(
         @Query("q") query: String,
         @Query("page") page: String
-    ): Call<RecipeSearchResponse>
+    ): LiveData<ApiResponse<RecipeSearchResponse>>
 
 
     // Get recipe request
     @GET("api/get")
     fun getRecipe(
         @Query("rId") recipeId: String
-    ): Call<RecipeResponse>
+    ): LiveData<ApiResponse<RecipeResponse>>
 }
