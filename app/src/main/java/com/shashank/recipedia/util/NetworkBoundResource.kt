@@ -76,6 +76,8 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(
         Log.d(TAG,"response from retrofit in form of LiveData received 1")
 
         results.addSource(apiResponse, Observer { requestObjectApiResponse ->
+            results.removeSource(dbSource)
+            results.removeSource(apiResponse)
             /**
              *  3 cases -
              *  1) ApiSuccessResponse

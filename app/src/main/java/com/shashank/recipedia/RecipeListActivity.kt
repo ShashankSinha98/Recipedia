@@ -54,7 +54,8 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
                 Log.d(TAG,"mRecipeListViewModel.getRecipes() onChanged: ${listResource.status}")
                 //  assumed it to be success
                 if(listResource.data!=null) {
-                    Testing.printRecipes(TAG, listResource.data)
+                    // Testing.printRecipes(TAG, listResource.data)
+                    mAdapter.setRecipes(listResource.data.toMutableList())
                 }
             }
         })
