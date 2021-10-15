@@ -16,7 +16,7 @@ abstract class RecipeDatabase: RoomDatabase() {
 
         private val DATABASE_NAME = "recipes_db"
 
-        private lateinit var instance: RecipeDatabase
+        private var instance: RecipeDatabase?= null
 
         fun getInstance(context: Context): RecipeDatabase {
             if(instance==null) {
@@ -27,7 +27,7 @@ abstract class RecipeDatabase: RoomDatabase() {
                 ).build()
             }
 
-            return instance
+            return instance!!
         }
     }
 

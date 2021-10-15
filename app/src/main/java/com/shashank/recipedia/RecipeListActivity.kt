@@ -48,6 +48,17 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
 
     private fun subscribeObservers() {
+
+        mRecipeListViewModel.getRecipes().observe(this, { listResource ->
+            listResource?.let {
+                Log.d(TAG,"mRecipeListViewModel.getRecipes() onChanged: ${listResource.status}")
+                //  assumed it to be success
+                if(listResource.data!=null) {
+                    Testing.printRecipes(TAG, listResource.data)
+                }
+            }
+        })
+
         mRecipeListViewModel.getViewState()?.observe(this, Observer { viewState ->
 
             viewState?.let {
@@ -74,7 +85,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
         mSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-
+                searchRecipesApi(query)
                 return false
             }
 
@@ -101,7 +112,12 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     }
 
     override fun onCategoryClick(category: String) {
+        searchRecipesApi(category)
+    }
 
+    private fun searchRecipesApi(query: String?) {
+        var q = query ?: ""
+        mRecipeListViewModel.searchRecipesApi(q, 1)
     }
 
 }

@@ -1,5 +1,6 @@
 package com.shashank.recipedia.util
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.shashank.recipedia.requests.responses.ApiResponse
 import retrofit2.CallAdapter
@@ -21,20 +22,25 @@ class LiveDataCallAdapterFactory: CallAdapter.Factory() {
      *
      */
 
+    private val TAG = "LiveDataCallAdapterFact"
+
 
     override fun get(
         returnType: Type,
         annotations: Array<out Annotation>,
         retrofit: Retrofit
     ): CallAdapter<*, *>? {
-
+        Log.d(TAG,"get start")
         // Check #1
         // Make sure the CallAdapter is returning a type of LiveData
 
 
         // Check #1
         // Make sure the CallAdapter is returning a type of LiveData
-        if(getRawType(returnType)!=LiveData::class) {
+        Log.d(TAG,"getRawType(returnType): ${getRawType(returnType)}")
+        Log.d(TAG,"LiveData::class: ${LiveData::class.java}")
+        if(getRawType(returnType)!= LiveData::class.java) {
+            Log.d(TAG,"check1 null")
             return null
         }
 
@@ -44,7 +50,8 @@ class LiveDataCallAdapterFactory: CallAdapter.Factory() {
 
         // Check if its of type ApiResponse
         val rawObservableType: Type = getRawType(observableType)
-        if(rawObservableType!=ApiResponse::class) {
+        if(rawObservableType!=ApiResponse::class.java) {
+            Log.d(TAG,"check2 error")
             throw IllegalArgumentException("Type must be a defined resource")
         }
 
@@ -52,6 +59,7 @@ class LiveDataCallAdapterFactory: CallAdapter.Factory() {
         // Check if ApiResponse is parameterized. AKA: Does ApiResponse<T> exists? (must wrap around T)
         // FYI: T is either RecipeResponse or T will be a RecipeSearchResponse
         if(observableType !is ParameterizedType) {
+            Log.d(TAG,"check3 null")
             throw IllegalArgumentException("resource must be parameterized")
         }
 

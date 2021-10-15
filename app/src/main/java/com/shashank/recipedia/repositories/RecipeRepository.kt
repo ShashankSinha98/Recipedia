@@ -3,15 +3,10 @@ package com.shashank.recipedia.repositories
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.shashank.recipedia.AppExecutors
 import com.shashank.recipedia.models.Recipe
-import com.shashank.recipedia.models.RecipeDetail
 import com.shashank.recipedia.persistence.RecipeDao
 import com.shashank.recipedia.persistence.RecipeDatabase
-import com.shashank.recipedia.requests.RecipeApiClient
 import com.shashank.recipedia.requests.ServiceGenerator
 import com.shashank.recipedia.requests.responses.ApiResponse
 import com.shashank.recipedia.requests.responses.RecipeSearchResponse
@@ -27,17 +22,22 @@ class RecipeRepository {
     }
 
     companion object {
-        private lateinit var instance: RecipeRepository
+        private var instance: RecipeRepository?= null
         private lateinit var recipeDao: RecipeDao
 
         fun getInstance(context: Context): RecipeRepository {
             if (instance == null) {
                 instance = RecipeRepository(context)
             }
-            return instance
+            return instance!!
         }
     }
 
+
+
+
+
+    // search recipe using query
     fun searchRecipesApi(
         query: String,
         pageNumber: Int): LiveData<Resource<List<Recipe>>> {
@@ -45,6 +45,9 @@ class RecipeRepository {
         return object: NetworkBoundResource<List<Recipe>, RecipeSearchResponse>(AppExecutors) {
 
             override fun saveCallResult(item: RecipeSearchResponse) {
+                Log.d(TAG,"saveCallResult called")
+                Log.d(TAG,"item: $item")
+
                 item.recipes?.let { recipes ->
 
                     for((index, rowId) in recipeDao.insertRecipes(*recipes.toTypedArray()).withIndex()) {
@@ -64,15 +67,21 @@ class RecipeRepository {
                 }
             }
 
+
             override fun shouldFetch(data: List<Recipe>): Boolean {
+                Log.d(TAG,"shouldFetch called")
+                Log.d(TAG,"data got from local db: $data")
                 return true // get everytime from network for list of recipes
             }
 
+
             override fun loadFromDB(): LiveData<List<Recipe>> {
+                Log.d(TAG,"loadFromDB called")
                 return recipeDao.searchRecipes(query, pageNumber)
             }
 
             override fun createCall(): LiveData<ApiResponse<RecipeSearchResponse>> {
+                Log.d(TAG,"createCall called")
                 return ServiceGenerator.recipeApi.searchRecipes(query, pageNumber.toString())
             }
 

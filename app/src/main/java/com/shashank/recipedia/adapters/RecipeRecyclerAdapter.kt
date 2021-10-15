@@ -132,7 +132,7 @@ class RecipeRecyclerAdapter(
 
     fun setQueryExhausted() {
         hideLoading()
-        val exhaustedRecipe = Recipe()
+        val exhaustedRecipe = Recipe(recipeId = "-1")
         exhaustedRecipe.title = "EXHAUSTED"
         mRecipes.add(exhaustedRecipe)
         notifyDataSetChanged()
@@ -160,7 +160,7 @@ class RecipeRecyclerAdapter(
 
     fun displayLoading() {
         if(!isLoading()) {
-            val recipe = Recipe()
+            val recipe = Recipe(recipeId = "-1")
             recipe.title = "LOADING"
             mRecipes.add(recipe)
             notifyDataSetChanged()
@@ -173,7 +173,7 @@ class RecipeRecyclerAdapter(
         val categories = mutableListOf<Recipe>()
 
         for(i in Constants.DEFAULT_SEARCH_CATEGORIES.indices) {
-            val recipe = Recipe()
+            val recipe = Recipe(recipeId = "-1")
             recipe.title = Constants.DEFAULT_SEARCH_CATEGORIES[i]
             recipe.imageUrl = Constants.DEFAULT_SEARCH_CATEGORY_IMAGES[i]
             recipe.socialRank = -1f

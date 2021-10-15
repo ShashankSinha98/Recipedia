@@ -23,19 +23,25 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(
 
 
     init {
+        Log.d(TAG,"NetworkBoundResource init start")
+
         // update livedata for loading status
+        Log.d(TAG,"update livedata for loading status")
         results.value = Resource.loading(null) as Resource<CacheObject>
 
         // observe livedata source from local db
+        Log.d(TAG,"observe livedata source from local db")
         val dbSource: LiveData<CacheObject> = loadFromDB()
 
         results.addSource(dbSource, Observer { cacheObject ->
             results.removeSource(dbSource) // stop observing this data source
 
             if(shouldFetch(cacheObject)) {
+                Log.d(TAG, "fetch from network")
                 // get data from network
                 fetchFromNetwork(dbSource)
             } else {
+                Log.d(TAG, "fetch from db only")
                 results.addSource(dbSource, Observer { cacheObject ->
                     setValue(Resource.success(cacheObject))
                 })
@@ -59,12 +65,15 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(
         Log.d(TAG, "fetchFromNetwork called")
 
         // update live data for loading status. show cached data meanwhile
+        Log.d(TAG,"update live data for loading status. show cached data meanwhile")
         results.addSource(dbSource, Observer { cacheObject->
             setValue(Resource.loading(cacheObject))
         })
 
         // response from retrofit in form of LiveData (not call)
+        Log.d(TAG,"getting response from retrofit in form of LiveData")
         val apiResponse: LiveData<ApiResponse<RequestObject>> = createCall()
+        Log.d(TAG,"response from retrofit in form of LiveData received 1")
 
         results.addSource(apiResponse, Observer { requestObjectApiResponse ->
             /**
@@ -73,7 +82,7 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(
              *  2) ApiEmptyResponse
              *  3) ApiErrorResponse
              * */
-
+            Log.d(TAG,"response from retrofit in form of LiveData received 2")
             when(requestObjectApiResponse) {
 
                 is ApiResponse.ApiSuccessResponse -> {
@@ -81,13 +90,17 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(
 
                     appExecutors.diskIO().execute { // save response to local db - need to be done on background thread, so used diskIO
                         // saveCallResult(processResponse(requestObjectApiResponse))
+                        Log.d(TAG,"requestObjectApiResponse.getBody(): ${requestObjectApiResponse.getBody()}")
                         saveCallResult(requestObjectApiResponse.getBody())
 
                         // pass result to our single source data i.e., results
+                        Log.d(TAG,"appExecutors.mainThread().execute called")
                         appExecutors.mainThread().execute { // used main thread as we need to SET value to our single source data i.e., results
 
                             // reading latest data from db
+                            Log.d(TAG,"reading latest data from db")
                             results.addSource(loadFromDB(), Observer { cacheObject ->
+                                Log.d(TAG,"pass result to our single source data i.e., results")
                                 setValue(Resource.success(cacheObject))
                             })
                         }
@@ -134,8 +147,12 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(
     // must be performed on Main Thread - for immediate results
     // postValue - background thread, might take some time (when resource/thread are free, only then it will execute)
     private fun setValue(newValue: Resource<CacheObject>) {
+        Log.d(TAG,"set value called")
         if(results.value != newValue) {
+            Log.d(TAG,"new value set: ${newValue.status}")
             results.value = newValue
+        } else {
+            Log.d(TAG,"new value not set, same as previous: ${results.value}")
         }
     }
 

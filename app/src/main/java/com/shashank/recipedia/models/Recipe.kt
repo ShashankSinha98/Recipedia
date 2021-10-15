@@ -15,6 +15,12 @@ import kotlinx.parcelize.Parcelize
 data class Recipe(
 
     @Expose
+    @SerializedName("id")
+    @PrimaryKey
+    @NonNull
+    var recipeId: String,
+
+    @Expose
     @SerializedName("title")
     @ColumnInfo(name="title")
     var title: String?= null,
@@ -29,11 +35,7 @@ data class Recipe(
     @ColumnInfo(name="ingredients")
     var ingredients: List<String>?= null,
 
-    @Expose
-    @SerializedName("id")
-    @PrimaryKey
-    @NonNull
-    var recipeId: String?= null,
+
 
     @Expose
     @SerializedName("imageUrl")
