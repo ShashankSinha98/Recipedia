@@ -122,12 +122,24 @@ class RecipeRecyclerAdapter(
             return LOADING_TYPE
         } else if(mRecipes.isNotEmpty() && mRecipes[position].title.equals("EXHAUSTED")) {
             return EXHAUSTED_TYPE
-        } else if (position == mRecipes.size-1 && position != 0
-            && !mRecipes[position].title.equals("EXHAUSTED")) {
-            return LOADING_TYPE
         } else {
             return RECIPE_TYPE
         }
+    }
+
+    // display loading during search request
+    fun displayOnlyLoading() {
+        clearRecipesList()
+        val recipe = Recipe(recipeId = "-1")
+        recipe.title = "LOADING"
+        mRecipes.add(recipe)
+        notifyDataSetChanged()
+
+    }
+
+    private fun clearRecipesList() {
+        mRecipes.clear()
+        notifyDataSetChanged()
     }
 
     fun setQueryExhausted() {
@@ -139,12 +151,14 @@ class RecipeRecyclerAdapter(
     }
 
 
-    private fun hideLoading() {
+    fun hideLoading() {
         if(isLoading()) {
-            for(recipe in mRecipes) {
-                if(recipe.title.equals("LOADING")) {
-                    mRecipes.remove(recipe)
-                }
+            if(mRecipes[0].title=="LOADING") {
+                mRecipes.removeAt(0)
+            }
+
+            else if(mRecipes[mRecipes.size-1].title=="LOADING") {
+                mRecipes.removeAt(mRecipes.size-1)
             }
             notifyDataSetChanged()
         }
@@ -158,6 +172,7 @@ class RecipeRecyclerAdapter(
     }
 
 
+    // display loading in pagination
     fun displayLoading() {
         if(!isLoading()) {
             val recipe = Recipe(recipeId = "-1")

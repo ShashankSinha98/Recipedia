@@ -42,7 +42,7 @@ class RecipeListViewModel(application: Application): AndroidViewModel(applicatio
 
     fun getRecipes(): LiveData<Resource<List<Recipe>>> = recipes
 
-    fun getPageNumber(): Int? = pageNumber
+    fun getPageNumber(): Int = pageNumber?:1
 
     fun searchRecipesApi(query: String, pageNumber: Int) {
         Log.d(TAG,"searchRecipesApi: query: $query, page no: $pageNumber")

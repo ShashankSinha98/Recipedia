@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shashank.recipedia.adapters.OnRecipeListener
 import com.shashank.recipedia.adapters.RecipeRecyclerAdapter
+import com.shashank.recipedia.util.Resource
 import com.shashank.recipedia.util.Testing
 import com.shashank.recipedia.util.VerticalSpacingItemDecorator
 import com.shashank.recipedia.viewmodels.RecipeListViewModel
@@ -54,8 +56,37 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
                 Log.d(TAG,"mRecipeListViewModel.getRecipes() onChanged: ${listResource.status}")
                 //  assumed it to be success
                 if(listResource.data!=null) {
-                    // Testing.printRecipes(TAG, listResource.data)
-                    mAdapter.setRecipes(listResource.data.toMutableList())
+
+                    when(listResource.status) {
+                        Resource.Status.LOADING -> {
+                            if(mRecipeListViewModel.getPageNumber()>1) {
+                                mAdapter.displayLoading()
+                            } else {
+                                mAdapter.displayOnlyLoading()
+                            }
+                        }
+
+                        Resource.Status.ERROR -> {
+                            Log.d(TAG,"onChanged: Cannot refresh the cache")
+                            Log.d(TAG,"onChanged: Error message: ${listResource.message}")
+                            Log.d(TAG,"onChanged: Status: ERROR, #recipes: ${listResource.data.size}")
+                            mAdapter.hideLoading()
+                            mAdapter.setRecipes(listResource.data.toMutableList())
+                            Toast.makeText(this, listResource.message, Toast.LENGTH_SHORT).show()
+
+                            if(listResource.message.equals(RecipeListViewModel.QUERY_EXHAUSTED)) {
+                                mAdapter.setQueryExhausted()
+                            }
+                        }
+
+                        Resource.Status.SUCCESS -> {
+                            Log.d(TAG, "onChanged: cache has been refreshed.")
+                            Log.d(TAG, "onChanged: status: SUCCESS, #Recipes: ${listResource.data.size}")
+                            mAdapter.hideLoading()
+                            mAdapter.setRecipes(listResource.data.toMutableList())
+
+                        }
+                    }
                 }
             }
         })
