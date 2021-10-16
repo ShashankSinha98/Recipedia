@@ -178,6 +178,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         if(mRecipeListViewModel.getViewState()?.value==RecipeListViewModel.ViewState.CATEGORIES) {
             super.onBackPressed()
         } else {
+            mRecipeListViewModel.cancelSearchRequest()
             mRecipeListViewModel.setViewCategories()
         }
     }

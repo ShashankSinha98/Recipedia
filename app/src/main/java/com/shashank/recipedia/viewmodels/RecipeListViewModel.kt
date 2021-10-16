@@ -25,6 +25,7 @@ class RecipeListViewModel(application: Application): AndroidViewModel(applicatio
     private var isPerformingQuery: Boolean= false
     private var pageNumber: Int?= null
     private var query: String?= null
+    private var cancelRequest: Boolean = false
 
     companion object {
         val QUERY_EXHAUSTED = "No more results..."
@@ -69,6 +70,7 @@ class RecipeListViewModel(application: Application): AndroidViewModel(applicatio
     }
 
     private fun executeRecipesSearch(query: String, pageNumber: Int) {
+        cancelRequest = false
         isPerformingQuery = true
         viewState?.value = ViewState.RECIPES
 
@@ -76,33 +78,51 @@ class RecipeListViewModel(application: Application): AndroidViewModel(applicatio
 
         recipes.addSource(repositorySource) { listResource ->
 
-            if(listResource!=null) {
-                recipes.value = listResource
+            if(!cancelRequest) {
+                if(listResource!=null) {
+                    recipes.value = listResource
 
-                if(listResource.status==Resource.Status.SUCCESS) {
-                    isPerformingQuery = false
+                    if(listResource.status==Resource.Status.SUCCESS) {
+                        isPerformingQuery = false
 
-                    if(listResource.data!=null) {
-                        if(listResource.data.isEmpty()) {
+                        if(listResource.data!=null) {
+                            if(listResource.data.isEmpty()) {
 
-                            Log.d(TAG,"onChanged: Query is exhausted")
-                            recipes.value = Resource<List<Recipe>>(
-                                status = Resource.Status.ERROR,
-                                data = listResource.data,
-                                message = QUERY_EXHAUSTED
-                            )
+                                Log.d(TAG,"onChanged: Query is exhausted")
+                                recipes.value = Resource<List<Recipe>>(
+                                    status = Resource.Status.ERROR,
+                                    data = listResource.data,
+                                    message = QUERY_EXHAUSTED
+                                )
+                            }
                         }
+                        recipes.removeSource(repositorySource)
+
+                    } else if(listResource.status==Resource.Status.ERROR) {
+
+                        isPerformingQuery=false
+                        recipes.removeSource(repositorySource)
                     }
-                    recipes.removeSource(repositorySource)
-
-                } else if(listResource.status==Resource.Status.ERROR) {
-
-                    isPerformingQuery=false
+                } else {
                     recipes.removeSource(repositorySource)
                 }
             } else {
+                // request cancelled
+                    Log.d(TAG, "Request cancelled...")
                 recipes.removeSource(repositorySource)
             }
+
+        }
+    }
+
+
+    fun cancelSearchRequest() {
+        if(isPerformingQuery) {
+            Log.d(TAG,"cancelSearchRequest: Cancelling the search request")
+            cancelRequest = true
+            isPerformingQuery = false
+            pageNumber = 1
+            query = ""
         }
     }
 }
