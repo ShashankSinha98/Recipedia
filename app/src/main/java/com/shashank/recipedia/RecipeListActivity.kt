@@ -133,10 +133,19 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private fun initRecyclerView() {
         mAdapter = RecipeRecyclerAdapter(this, initGlide())
         mRecyclerView.addItemDecoration(VerticalSpacingItemDecorator(30))
-        mRecyclerView.adapter = mAdapter
         mRecyclerView.layoutManager = LinearLayoutManager(this)
 
+        mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if(!mRecyclerView.canScrollVertically(1)
+                    && mRecipeListViewModel.getViewState()?.value==RecipeListViewModel.ViewState.RECIPES) {
+                    mRecipeListViewModel.searchNextPage()
+                }
+            }
+        })
 
+        mRecyclerView.adapter = mAdapter
     }
 
 
@@ -152,7 +161,9 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
     private fun searchRecipesApi(query: String?) {
         var q = query ?: ""
+        mRecyclerView.smoothScrollToPosition(0) // top of list
         mRecipeListViewModel.searchRecipesApi(q, 1)
+        mSearchView.clearFocus()
     }
 
     private fun initGlide(): RequestManager {

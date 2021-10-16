@@ -57,6 +57,13 @@ class RecipeListViewModel(application: Application): AndroidViewModel(applicatio
         }
     }
 
+    fun searchNextPage() {
+        if(!isQueryExhausted && !isPerformingQuery) {
+            pageNumber = pageNumber!! + 1
+            executeRecipesSearch(query!!, pageNumber!!)
+        }
+    }
+
     private fun executeRecipesSearch(query: String, pageNumber: Int) {
         isPerformingQuery = true
         viewState?.value = ViewState.RECIPES
