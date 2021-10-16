@@ -9,6 +9,10 @@ import kotlinx.parcelize.Parcelize
 data class RecipeDetail(
 
     @Expose
+    @SerializedName("recipe_id")
+    var recipeId: String,
+
+    @Expose
     @SerializedName("title")
     var title: String?= null,
 
@@ -19,10 +23,6 @@ data class RecipeDetail(
     @Expose
     @SerializedName("ingredients")
     var ingredients: List<String>?= null,
-
-    @Expose
-    @SerializedName("recipe_id")
-    var recipeId: String?= null,
 
     @Expose
     @SerializedName("image_url")

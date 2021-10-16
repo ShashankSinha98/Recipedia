@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.util.ViewPreloadSizeProvider
 import com.shashank.recipedia.adapters.OnRecipeListener
 import com.shashank.recipedia.adapters.RecipeRecyclerAdapter
 import com.shashank.recipedia.util.Resource
@@ -131,9 +133,18 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
 
     private fun initRecyclerView() {
-        mAdapter = RecipeRecyclerAdapter(this, initGlide())
+        val viewPreloader: ViewPreloadSizeProvider<String> = ViewPreloadSizeProvider<String>()
+        mAdapter = RecipeRecyclerAdapter(this, initGlide(), viewPreloader)
         mRecyclerView.addItemDecoration(VerticalSpacingItemDecorator(30))
         mRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        val preloader: RecyclerViewPreloader<String> = RecyclerViewPreloader<String>(
+            Glide.with(this),
+            mAdapter,
+            viewPreloader,
+            30)
+
+        mRecyclerView.addOnScrollListener(preloader)
 
         mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

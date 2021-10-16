@@ -6,6 +6,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.util.ViewPreloadSizeProvider
 import com.shashank.recipedia.R
 import com.shashank.recipedia.models.Recipe
 import com.shashank.recipedia.util.Constants
@@ -14,7 +15,8 @@ import kotlin.math.roundToInt
 class RecipeViewHolder(
     itemView: View,
     private val onRecipeListener: OnRecipeListener,
-    private val requestManager: RequestManager) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    private val requestManager: RequestManager,
+    private val viewPreloadSizeProvider: ViewPreloadSizeProvider<String>) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
 
     private val title: TextView = itemView.findViewById(R.id.recipe_title)
@@ -36,6 +38,8 @@ class RecipeViewHolder(
         requestManager
             .load(recipe.imageUrl?: Constants.IMAGE_NOT_FOUND_URL)
             .into(imageView)
+
+        viewPreloadSizeProvider.setView(imageView)
     }
 
 

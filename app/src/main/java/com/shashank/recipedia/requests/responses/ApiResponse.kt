@@ -18,6 +18,7 @@ open class ApiResponse<T> {
 
     // for response - can be success or failure
     fun create(response: Response<T>): ApiResponse<T> {
+
         if(response.isSuccessful) {
             val body: T? = response.body()
 
@@ -45,7 +46,7 @@ open class ApiResponse<T> {
     // 3 diff types of API Responses
 
     class ApiSuccessResponse<T>(private val body: T): ApiResponse<T>() {
-        fun getBody() = body
+        fun getBody(): T = body
     }
 
     class ApiErrorResponse<T>(private val errorMessage: String): ApiResponse<T>() {

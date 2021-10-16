@@ -1,22 +1,28 @@
 package com.shashank.recipedia.adapters
 
 import android.net.Uri
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.ListPreloader
+import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.util.ViewPreloadSizeProvider
 import com.shashank.recipedia.R
 import com.shashank.recipedia.models.Recipe
 import com.shashank.recipedia.util.Constants
+import java.util.*
 import kotlin.math.roundToInt
 
 class RecipeRecyclerAdapter(
     private val mOnRecipeListener: OnRecipeListener,
-    private val mRequestManager: RequestManager
-): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val mRequestManager: RequestManager,
+    private val viewPreloadSizeProvider: ViewPreloadSizeProvider<String>
+): RecyclerView.Adapter<RecyclerView.ViewHolder>(), ListPreloader.PreloadModelProvider<String> {
 
     companion object {
         private val RECIPE_TYPE = 1
@@ -40,7 +46,7 @@ class RecipeRecyclerAdapter(
                 view = LayoutInflater.from(parent.context).inflate(R.layout.layout_recipe_list_item,
                     parent, false)
 
-                return RecipeViewHolder(view, mOnRecipeListener, mRequestManager)
+                return RecipeViewHolder(view, mOnRecipeListener, mRequestManager, viewPreloadSizeProvider)
             }
 
             LOADING_TYPE -> {
@@ -69,7 +75,7 @@ class RecipeRecyclerAdapter(
                 view = LayoutInflater.from(parent.context).inflate(R.layout.layout_recipe_list_item,
                     parent, false)
 
-                return RecipeViewHolder(view, mOnRecipeListener, mRequestManager)
+                return RecipeViewHolder(view, mOnRecipeListener, mRequestManager, viewPreloadSizeProvider)
             }
         }
     }
@@ -196,5 +202,19 @@ class RecipeRecyclerAdapter(
             }
         }
         return null
+    }
+
+    /**
+     *    GLIDE PRE-LOADERS
+     * */
+    override fun getPreloadItems(position: Int): MutableList<String> {
+        val url = mRecipes[position].imageUrl
+        if(TextUtils.isEmpty(url)) return Collections.emptyList()
+
+        return Collections.singletonList(url)
+    }
+
+    override fun getPreloadRequestBuilder(item: String): RequestBuilder<*>? {
+        return mRequestManager.load(item)
     }
 }

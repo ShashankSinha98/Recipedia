@@ -9,7 +9,9 @@ import com.shashank.recipedia.persistence.RecipeDao
 import com.shashank.recipedia.persistence.RecipeDatabase
 import com.shashank.recipedia.requests.ServiceGenerator
 import com.shashank.recipedia.requests.responses.ApiResponse
+import com.shashank.recipedia.requests.responses.RecipeResponse
 import com.shashank.recipedia.requests.responses.RecipeSearchResponse
+import com.shashank.recipedia.util.Constants
 import com.shashank.recipedia.util.NetworkBoundResource
 import com.shashank.recipedia.util.Resource
 
@@ -87,4 +89,54 @@ class RecipeRepository {
 
         }.getAsLiveData()
     }
+
+
+    fun searchRecipeApi(
+        recipeId: String
+    ): LiveData<Resource<Recipe>> {
+        return object : NetworkBoundResource<Recipe, RecipeResponse>(AppExecutors) {
+
+            override fun saveCallResult(item: RecipeResponse) {
+
+                if(item.recipeDetail!=null) {
+                    val recipe = Recipe(
+                        recipeId= item.recipeDetail.recipeId,
+                        title = item.recipeDetail.title,
+                        publisher = item.recipeDetail.publisher,
+                        ingredients = item.recipeDetail.ingredients,
+                        imageUrl =  item.recipeDetail.imageUrl,
+                        socialRank = item.recipeDetail.socialRank,
+                        timestamp = (System.currentTimeMillis()/1000).toInt()
+                    )
+                    recipeDao.insertRecipe(recipe)
+                }
+            }
+
+            override fun shouldFetch(data: Recipe): Boolean {
+                Log.d(TAG,"shouldFetch: recipe: $data")
+                val currentTime = (System.currentTimeMillis()/1000).toInt()
+                Log.d(TAG,"shouldFetch: current time: $currentTime")
+                val lastRefresh = data.timestamp?:0
+                Log.d(TAG,"shouldFetch: last refresh: $lastRefresh")
+                Log.d(TAG,"shouldFetch: it's been ${(currentTime-lastRefresh)/60/60/24}" +
+                        " days since this recipe was refreshed. 30 days must elapse before refreshing.")
+
+                if((currentTime-lastRefresh)>=Constants.RECIPE_REFRESH_TIME) {
+                    Log.d(TAG,"shouldFetch: SHOULD REFRESH RECIPE: true")
+                    return true
+                }
+                Log.d(TAG,"shouldFetch: SHOULD REFRESH RECIPE: false")
+                return false
+            }
+
+            override fun loadFromDB(): LiveData<Recipe> = recipeDao.getRecipe(recipeId)
+
+            override fun createCall(): LiveData<ApiResponse<RecipeResponse>> {
+                return ServiceGenerator.recipeApi.getRecipe(recipeId)
+            }
+
+        }.getAsLiveData()
+    }
+
+
 }
