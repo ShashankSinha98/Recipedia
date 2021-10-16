@@ -64,6 +64,10 @@ class RecipeListViewModel(application: Application): AndroidViewModel(applicatio
         }
     }
 
+    fun setViewCategories() {
+        viewState?.value = ViewState.CATEGORIES
+    }
+
     private fun executeRecipesSearch(query: String, pageNumber: Int) {
         isPerformingQuery = true
         viewState?.value = ViewState.RECIPES

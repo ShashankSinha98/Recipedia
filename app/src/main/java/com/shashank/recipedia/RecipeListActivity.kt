@@ -174,4 +174,12 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         return Glide.with(this).setDefaultRequestOptions(options)
     }
 
+    override fun onBackPressed() {
+        if(mRecipeListViewModel.getViewState()?.value==RecipeListViewModel.ViewState.CATEGORIES) {
+            super.onBackPressed()
+        } else {
+            mRecipeListViewModel.setViewCategories()
+        }
+    }
+
 }
