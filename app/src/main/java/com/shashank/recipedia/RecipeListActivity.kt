@@ -12,6 +12,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.request.RequestOptions
 import com.shashank.recipedia.adapters.OnRecipeListener
 import com.shashank.recipedia.adapters.RecipeRecyclerAdapter
 import com.shashank.recipedia.util.Resource
@@ -128,7 +131,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
 
     private fun initRecyclerView() {
-        mAdapter = RecipeRecyclerAdapter(this)
+        mAdapter = RecipeRecyclerAdapter(this, initGlide())
         mRecyclerView.addItemDecoration(VerticalSpacingItemDecorator(30))
         mRecyclerView.adapter = mAdapter
         mRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -150,6 +153,14 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private fun searchRecipesApi(query: String?) {
         var q = query ?: ""
         mRecipeListViewModel.searchRecipesApi(q, 1)
+    }
+
+    private fun initGlide(): RequestManager {
+        val options = RequestOptions()
+            .placeholder(R.drawable.loading_img)
+            .error(R.drawable.error_img)
+
+        return Glide.with(this).setDefaultRequestOptions(options)
     }
 
 }

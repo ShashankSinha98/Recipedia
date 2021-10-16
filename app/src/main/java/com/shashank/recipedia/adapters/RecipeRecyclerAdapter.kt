@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.shashank.recipedia.R
 import com.shashank.recipedia.models.Recipe
@@ -13,7 +14,8 @@ import com.shashank.recipedia.util.Constants
 import kotlin.math.roundToInt
 
 class RecipeRecyclerAdapter(
-    private val mOnRecipeListener: OnRecipeListener
+    private val mOnRecipeListener: OnRecipeListener,
+    private val mRequestManager: RequestManager
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -27,6 +29,7 @@ class RecipeRecyclerAdapter(
     private var mRecipes: MutableList<Recipe> = mutableListOf<Recipe>()
 
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
         var view: View?= null
@@ -37,7 +40,7 @@ class RecipeRecyclerAdapter(
                 view = LayoutInflater.from(parent.context).inflate(R.layout.layout_recipe_list_item,
                     parent, false)
 
-                return RecipeViewHolder(view, mOnRecipeListener)
+                return RecipeViewHolder(view, mOnRecipeListener, mRequestManager)
             }
 
             LOADING_TYPE -> {
@@ -59,14 +62,14 @@ class RecipeRecyclerAdapter(
                 view = LayoutInflater.from(parent.context).inflate(R.layout.layout_category_list_item,
                     parent, false)
 
-                return CategoryViewHolder(view, mOnRecipeListener)
+                return CategoryViewHolder(view, mOnRecipeListener, mRequestManager)
             }
 
             else -> {
                 view = LayoutInflater.from(parent.context).inflate(R.layout.layout_recipe_list_item,
                     parent, false)
 
-                return RecipeViewHolder(view, mOnRecipeListener)
+                return RecipeViewHolder(view, mOnRecipeListener, mRequestManager)
             }
         }
     }
@@ -83,32 +86,13 @@ class RecipeRecyclerAdapter(
         if(itemViewType == RECIPE_TYPE) {
 
             val recipeViewHolder = holder as RecipeViewHolder
-
-            recipeViewHolder.apply {
-                title.text = mRecipes[position].title?: Constants.TEXT_NOT_FOUND_MSG
-                publisher.text = mRecipes[position].publisher?: Constants.TEXT_NOT_FOUND_MSG
-                socialScore.text = (mRecipes[position].socialRank ?: Constants.SCORE_NOT_FOUND_MSG).
-                roundToInt().toString()
-
-                Glide.with(holder.itemView.context)
-                    .setDefaultRequestOptions(requestOptions)
-                    .load(mRecipes[position].imageUrl?: Constants.IMAGE_NOT_FOUND_URL)
-                    .into(imageView)
-            }
+            recipeViewHolder.onBind(mRecipes[position])
         }
 
         else if(itemViewType == CATEGORY_TYPE) {
 
             val categoryViewHolder = holder as CategoryViewHolder
-
-            val path: Uri = Uri.parse("android.resource://com.shashank.recipedia/drawable/${mRecipes[position].imageUrl}")
-
-            Glide.with(categoryViewHolder.itemView.context)
-                .setDefaultRequestOptions(requestOptions)
-                .load(path)
-                .into(categoryViewHolder.categoryImage)
-
-            categoryViewHolder.categoryTitle.text = mRecipes[position].title
+            categoryViewHolder.onBind(mRecipes[position])
 
         }
     }
